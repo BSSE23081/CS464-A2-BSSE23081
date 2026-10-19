@@ -4,10 +4,11 @@ public class CameraFollow : MonoBehaviour
 {
     [SerializeField] Transform target;               // left empty: found in Awake
     [SerializeField] Vector3 offset = new Vector3(0f, 5f, -7f);
-    [SerializeField] float sharpness = 5f;           // k in blend = 1 - e^(-k dt)
-    [SerializeField] float lookAhead = 0.35f;        // seconds of velocity
+    [SerializeField] float sharpness = 4f;           // k in blend = 1 - e^(-k dt)
+    [SerializeField] float lookAhead = 0.2f;         // seconds of velocity
 
     Rigidbody targetRb;
+    Vector3 focus;                                   // the smoothed point we aim at
 
     void Awake()
     {
@@ -16,7 +17,11 @@ public class CameraFollow : MonoBehaviour
             var player = FindAnyObjectByType<PlayerController>();
             if (player != null) target = player.transform;
         }
-        if (target != null) targetRb = target.GetComponent<Rigidbody>();
+        if (target != null)
+        {
+            targetRb = target.GetComponent<Rigidbody>();
+            focus = target.position;                 // start on the player, no swoop
+        }
     }
 
     void LateUpdate()
@@ -27,12 +32,16 @@ public class CameraFollow : MonoBehaviour
             ? new Vector3(targetRb.linearVelocity.x, 0f, targetRb.linearVelocity.z)
             : Vector3.zero;
 
-        Vector3 aim = target.position + flatVel * lookAhead;   // where the player will be
-        Vector3 wanted = aim + offset;
+        // where the player will be
+        Vector3 aim = target.position + flatVel * lookAhead;
 
+        // smooth the aim point itself, frame-rate independent
         float blend = 1f - Mathf.Exp(-sharpness * Time.deltaTime);
-        transform.position = Vector3.Lerp(transform.position, wanted, blend);
+        focus = Vector3.Lerp(focus, aim, blend);
 
-        transform.LookAt(aim);                                  // look at the aim point, not the player
+        // camera keeps a fixed offset from the smoothed point, so it never
+        // swings its angle when the player starts or stops
+        transform.position = focus + offset;
+        transform.LookAt(focus);
     }
 }

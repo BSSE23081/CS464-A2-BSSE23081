@@ -1,6 +1,6 @@
 # CS464 Assignment 02 - Saleha - BSSE23081
 
-- **Video:** [PASTE YOUR VIDEO LINK HERE]
+- **Video:** https://drive.google.com/file/d/1t1iIliN8qK9lw6iLWjLmqfOSt_F0NmxT/view?usp=sharing
 - **Input:** old Input system, with Active Input Handling set to Both. I read all keys in Update.
 - **Ground check:** CheckSphere at a Feet object under the player, radius 0.2, only the Ground layer in the mask. It draws a gizmo, green on the ground and red in the air.
 - **Camera:** smoothing with 1 - e^(-k*dt), k = 4, and a look-ahead of 0.2 s. I smooth the point the camera looks at, and the camera follows that point.
